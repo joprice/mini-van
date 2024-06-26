@@ -31,9 +31,12 @@ const escapeAttr = v => v.replace(/"/g, "&quot;")
 
 const protoOf = Object.getPrototypeOf, funcProto = protoOf(protoOf), objProto = protoOf(noChild)
 
-const stateProto = {get oldVal() { return this.val }}
+const stateProto = {
+  get oldVal() { return this.val },
+  get rawVal() { return this.val }
+}
 
-const state = initVal => ({__proto__: stateProto, val: initVal})
+const state = initVal => ({ __proto__: stateProto, val: initVal })
 
 const plainValue = (v, k) => {
   let protoOfV = protoOf(v ?? 0)
@@ -69,11 +72,13 @@ const tag = (name, ...args) => {
       // as they're usually not useful for SSR (server-side rendering).
       protoOf(plainV) !== funcProto ? ` ${lowerK}=${JSON.stringify(escapeAttr(plainV.toString()))}` : ""
   }).join("")
-  return {__proto__: elementProto, name, propsStr,
-    children: children.flat(Infinity).filter(c => c != null)}
+  return {
+    __proto__: elementProto, name, propsStr,
+    children: children.flat(Infinity).filter(c => c != null)
+  }
 }
 
-const handler = {get: (_, name) => tag.bind(null, name)}
+const handler = { get: (_, name) => tag.bind(null, name) }
 const tags = new Proxy(_ => new Proxy(tag, handler), handler)
 
 const add = (dom, ...children) => {

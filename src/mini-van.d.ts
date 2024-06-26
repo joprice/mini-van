@@ -1,6 +1,7 @@
 export interface State<T> {
   val: T
   readonly oldVal: T
+  readonly rawVal: T
 }
 
 // Defining readonly view of State<T> for covariance.
@@ -13,7 +14,7 @@ export type PropValue = Primitive | ((e: any) => void) | null
 
 export type Props = Record<string, PropValue | StateView<PropValue> | (() => PropValue)>
 
-interface HasFirstChild {firstChild?: unknown}
+interface HasFirstChild { firstChild?: unknown }
 
 type NodeType<ElementType extends HasFirstChild> =
   Omit<ElementType["firstChild"], "after" | "before" | "remove" | "replaceWith">
