@@ -9,8 +9,8 @@
     };
     const tests = {
       tags_select: () => {
-        const dom = select(option({ selected: true }, "A"), option({ selected: false }, "A"));
-        assertEq(dom.outerHTML, "<select><option selected>A</option><option>A</option></select>");
+        const dom = select(option({ selected: true }, "A"), option({ selected: false }, "B"));
+        assertEq(dom.outerHTML, '<select><option selected="">A</option><option>B</option></select>');
       },
       tags_basic: () => {
         const dom = div2(p("\u{1F44B}Hello"), ul(li("\u{1F5FA}\uFE0FWorld"), li(a({ href: "https://vanjs.org/" }, "\u{1F366}VanJS"))));

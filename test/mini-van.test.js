@@ -7,8 +7,8 @@ const runTests = (van, msgDom) => {
     };
     const tests = {
         tags_select: () => {
-            const dom = select(option({ selected: true }, "A"), option({ selected: false }, "A"));
-            assertEq(dom.outerHTML, '<select><option selected>A</option><option>A</option></select>');
+            const dom = select(option({ selected: true }, "A"), option({ selected: false }, "B"));
+            assertEq(dom.outerHTML, '<select><option selected="">A</option><option>B</option></select>');
         },
         tags_basic: () => {
             const dom = div(p("👋Hello"), ul(li("🗺️World"), li(a({ href: "https://vanjs.org/" }, "🍦VanJS"))));
