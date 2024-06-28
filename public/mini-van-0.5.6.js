@@ -5,9 +5,12 @@
 // Aliasing some builtin symbols to reduce the bundle size.
 let protoOf = Object.getPrototypeOf, _undefined, funcProto = protoOf(protoOf)
 
-let stateProto = {get oldVal() { return this.val }}, objProto = protoOf(stateProto)
+let stateProto = {
+  get oldVal() { return this.val },
+  get rawVal() { return this.val }
+}, objProto = protoOf(stateProto)
 
-let state = initVal => ({__proto__: stateProto, val: initVal})
+let state = initVal => ({ __proto__: stateProto, val: initVal })
 
 let plainValue = (k, v) => {
   let protoOfV = protoOf(v ?? 0)
@@ -16,9 +19,9 @@ let plainValue = (k, v) => {
 }
 
 let add = (dom, ...children) =>
-  (dom.append(...children.flat(Infinity)
-    .map(plainValue.bind(_undefined, _undefined))
-    .filter(c => c != _undefined)),
+(dom.append(...children.flat(Infinity)
+  .map(plainValue.bind(_undefined, _undefined))
+  .filter(c => c != _undefined)),
   dom)
 
 let vanWithDoc = doc => {
@@ -27,14 +30,18 @@ let vanWithDoc = doc => {
     let dom = ns ? doc.createElementNS(ns, name) : doc.createElement(name)
     for (let [k, v] of Object.entries(props)) {
       let plainV = plainValue(k, v)
-      // Disable setting attribute for function-valued properties (mostly event handlers),
-      // as they're usually not useful for SSR (server-side rendering).
-      protoOf(plainV) !== funcProto && dom.setAttribute(k, plainV)
+      if (typeof plainV === "boolean") {
+        plainV && dom.setAttribute(k, plainV)
+      } else {
+        // Disable setting attribute for function-valued properties (mostly event handlers),
+        // as they're usually not useful for SSR (server-side rendering).
+        protoOf(plainV) !== funcProto && dom.setAttribute(k, plainV)
+      }
     }
     return add(dom, ...children)
   }
 
-  let handler = ns => ({get: (_, name) => tag.bind(_undefined, ns, name)})
+  let handler = ns => ({ get: (_, name) => tag.bind(_undefined, ns, name) })
   let tags = new Proxy(ns => new Proxy(tag, handler(ns)), handler())
 
   return {
@@ -43,5 +50,7 @@ let vanWithDoc = doc => {
   }
 }
 
-export default {"vanWithDoc": vanWithDoc,
-  ...vanWithDoc(typeof window !== "undefined" ? window.document : null)}
+export default {
+  "vanWithDoc": vanWithDoc,
+  ...vanWithDoc(typeof window !== "undefined" ? window.document : null)
+}
