@@ -1,11 +1,18 @@
 window.numTests = 0;
 const runTests = (van, msgDom) => {
-    const { a, body, button, div, head, input, li, p, pre, span, title, ul } = van.tags;
+    const { a, body, button, div, head, input, li, p, pre, span, title, ul, select, option } = van.tags;
     const assertEq = (lhs, rhs) => {
         if (lhs !== rhs)
             throw new Error(`Assertion failed. Expected equal. Actual lhs: ${lhs}, rhs: ${rhs}`);
     };
     const tests = {
+        tags_select: () => {
+            const dom = select(
+                option({ selected: true }, "A"),
+                option({ selected: false }, "A")
+            )
+            assertEq(dom.outerHTML, '<select><option selected>A</option><option>A</option></select>');
+        },
         tags_basic: () => {
             const dom = div(p("👋Hello"), ul(li("🗺️World"), li(a({ href: "https://vanjs.org/" }, "🍦VanJS"))));
             assertEq(dom.outerHTML, '<div><p>👋Hello</p><ul><li>🗺️World</li><li><a href="https://vanjs.org/">🍦VanJS</a></li></ul></div>');
