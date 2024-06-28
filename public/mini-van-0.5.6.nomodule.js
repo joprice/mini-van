@@ -25,7 +25,7 @@
       for (let [k, v] of Object.entries(props)) {
         let plainV = plainValue(k, v);
         if (typeof plainV === "boolean") {
-          plainV && dom.setAttribute(k, plainV);
+          plainV && dom.setAttribute(k, "");
         } else {
           protoOf(plainV) !== funcProto && dom.setAttribute(k, plainV);
         }

@@ -31,7 +31,7 @@ let vanWithDoc = doc => {
     for (let [k, v] of Object.entries(props)) {
       let plainV = plainValue(k, v)
       if (typeof plainV === "boolean") {
-        plainV && dom.setAttribute(k, plainV)
+        plainV && dom.setAttribute(k, "")
       } else {
         // Disable setting attribute for function-valued properties (mostly event handlers),
         // as they're usually not useful for SSR (server-side rendering).
