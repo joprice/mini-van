@@ -14,4 +14,4 @@ export interface VanObj {
     readonly add: Function;
     readonly tags: Record<string, Function> & ((namespaceURI: string) => Record<string, Function>);
 }
-export { };
+export {};

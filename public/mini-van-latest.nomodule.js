@@ -3,9 +3,14 @@
   var protoOf = Object.getPrototypeOf;
   var _undefined;
   var funcProto = protoOf(protoOf);
-  var stateProto = { get oldVal() {
-    return this.val;
-  } };
+  var stateProto = {
+    get oldVal() {
+      return this.val;
+    },
+    get rawVal() {
+      return this.val;
+    }
+  };
   var objProto = protoOf(stateProto);
   var state = (initVal) => ({ __proto__: stateProto, val: initVal });
   var plainValue = (k, v) => {
@@ -19,7 +24,11 @@
       let dom = ns ? doc.createElementNS(ns, name) : doc.createElement(name);
       for (let [k, v] of Object.entries(props)) {
         let plainV = plainValue(k, v);
-        protoOf(plainV) !== funcProto && dom.setAttribute(k, plainV);
+        if (typeof plainV === "boolean") {
+          plainV && dom.setAttribute(k, plainV);
+        } else {
+          protoOf(plainV) !== funcProto && dom.setAttribute(k, plainV);
+        }
       }
       return add(dom, ...children);
     };
