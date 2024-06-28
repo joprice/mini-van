@@ -7,10 +7,7 @@ const runTests = (van, msgDom) => {
     };
     const tests = {
         tags_select: () => {
-            const dom = select(
-                option({ selected: true }, "A"),
-                option({ selected: false }, "A")
-            )
+            const dom = select(option({ selected: true }, "A"), option({ selected: false }, "A"));
             assertEq(dom.outerHTML, '<select><option selected>A</option><option>A</option></select>');
         },
         tags_basic: () => {
@@ -102,7 +99,9 @@ const runTests = (van, msgDom) => {
                 "data-id": () => state2.val + 2,
                 "data-title": state3,
                 "data-text": () => `Prefix - ${state4.rawVal} - Suffix`,
-            }, () => state1.val, () => state2.oldVal, state3, () => state4.val), button({ onclick: van.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")') }, "Button1"), button({ onclick: van.derive(() => state6.val ? () => console.log("Hello") : () => alert("Hello")) }, "Button2"), () => (state5.val ? pre : div)(state3), () => (state6.rawVal ? pre : div)(state4));
+            }, () => state1.val, () => state2.oldVal, state3, () => state4.val), button({ onclick: van.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")') }, "Button1"), button({
+                onclick: van.derive(() => state6.val ? () => console.log("Hello") : () => alert("Hello"))
+            }, "Button2"), () => (state5.val ? pre : div)(state3), () => (state6.rawVal ? pre : div)(state4));
             assertEq(dom.outerHTML, '<div>1<span>2</span><p>Prefix - abc</p>abcabc - Suffix<p data-index="1" data-id="4" data-title="abc" data-text="Prefix - abcabc - Suffix">12abcabcabc</p><button onclick="alert(&quot;Hello&quot;)">Button1</button><button>Button2</button><div>abc</div><pre>abcabc</pre></div>');
         },
         fragment: () => {

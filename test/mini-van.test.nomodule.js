@@ -2,12 +2,16 @@
   // ../test/mini-van.test.js
   window.numTests = 0;
   var runTests = (van2, msgDom2) => {
-    const { a, body, button, div: div2, head, input, li, p, pre, span, title, ul } = van2.tags;
+    const { a, body, button, div: div2, head, input, li, p, pre, span, title, ul, select, option } = van2.tags;
     const assertEq = (lhs, rhs) => {
       if (lhs !== rhs)
         throw new Error(`Assertion failed. Expected equal. Actual lhs: ${lhs}, rhs: ${rhs}`);
     };
     const tests = {
+      tags_select: () => {
+        const dom = select(option({ selected: true }, "A"), option({ selected: false }, "A"));
+        assertEq(dom.outerHTML, "<select><option selected>A</option><option>A</option></select>");
+      },
       tags_basic: () => {
         const dom = div2(p("\u{1F44B}Hello"), ul(li("\u{1F5FA}\uFE0FWorld"), li(a({ href: "https://vanjs.org/" }, "\u{1F366}VanJS"))));
         assertEq(dom.outerHTML, '<div><p>\u{1F44B}Hello</p><ul><li>\u{1F5FA}\uFE0FWorld</li><li><a href="https://vanjs.org/">\u{1F366}VanJS</a></li></ul></div>');
@@ -90,7 +94,9 @@
           "data-id": () => state2.val + 2,
           "data-title": state3,
           "data-text": () => `Prefix - ${state4.rawVal} - Suffix`
-        }, () => state1.val, () => state2.oldVal, state3, () => state4.val), button({ onclick: van2.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")') }, "Button1"), button({ onclick: van2.derive(() => state6.val ? () => console.log("Hello") : () => alert("Hello")) }, "Button2"), () => (state5.val ? pre : div2)(state3), () => (state6.rawVal ? pre : div2)(state4));
+        }, () => state1.val, () => state2.oldVal, state3, () => state4.val), button({ onclick: van2.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")') }, "Button1"), button({
+          onclick: van2.derive(() => state6.val ? () => console.log("Hello") : () => alert("Hello"))
+        }, "Button2"), () => (state5.val ? pre : div2)(state3), () => (state6.rawVal ? pre : div2)(state4));
         assertEq(dom.outerHTML, '<div>1<span>2</span><p>Prefix - abc</p>abcabc - Suffix<p data-index="1" data-id="4" data-title="abc" data-text="Prefix - abcabc - Suffix">12abcabcabc</p><button onclick="alert(&quot;Hello&quot;)">Button1</button><button>Button2</button><div>abc</div><pre>abcabc</pre></div>');
       },
       fragment: () => {

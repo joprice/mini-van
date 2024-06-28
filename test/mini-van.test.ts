@@ -1,21 +1,28 @@
-import type {Van} from "../src/mini-van.d.ts"
+import type { Van } from "../src/mini-van.d.ts"
 
 (<any>window).numTests = 0
 
 const runTests = (van: Van, msgDom: Element) => {
-  const {a, body, button, div, head, input, li, p, pre, span, title, ul} = van.tags
+  const { a, body, button, div, head, input, li, p, pre, span, title, ul, select, option } = van.tags
 
   const assertEq = (lhs: string | Element, rhs: string | Element) => {
     if (lhs !== rhs) throw new Error(`Assertion failed. Expected equal. Actual lhs: ${lhs}, rhs: ${rhs}`)
   }
 
   const tests = {
+    tags_select: () => {
+      const dom = select(
+        option({ selected: true }, "A"),
+        option({ selected: false }, "A")
+      )
+      assertEq(dom.outerHTML, '<select><option selected>A</option><option>A</option></select>');
+    },
     tags_basic: () => {
       const dom = div(
         p("👋Hello"),
         ul(
           li("🗺️World"),
-          li(a({href: "https://vanjs.org/"}, "🍦VanJS")),
+          li(a({ href: "https://vanjs.org/" }, "🍦VanJS")),
         ),
       )
 
@@ -24,18 +31,18 @@ const runTests = (van: Van, msgDom: Element) => {
 
     tags_onclickHandler: () => {
       {
-        const dom = div(button({onclick: 'alert("Hello")'}, "Click me"))
+        const dom = div(button({ onclick: 'alert("Hello")' }, "Click me"))
         assertEq(dom.outerHTML, '<div><button onclick="alert(&quot;Hello&quot;)">Click me</button></div>')
       }
 
       {
-        const dom = div(button({onClick: 'alert("Hello")'}, "Click me"))
+        const dom = div(button({ onClick: 'alert("Hello")' }, "Click me"))
         assertEq(dom.outerHTML, '<div><button onclick="alert(&quot;Hello&quot;)">Click me</button></div>')
       }
 
       {
         // Function-valued onclick handler will be skipped
-        const dom = div(button({onclick: () => alert("Hello")}, "Click me"))
+        const dom = div(button({ onclick: () => alert("Hello") }, "Click me"))
         assertEq(dom.outerHTML, '<div><button>Click me</button></div>')
       }
     },
@@ -56,7 +63,7 @@ const runTests = (van: Van, msgDom: Element) => {
 
     tags_nullOrUndefinedAreIgnored: () => {
       assertEq(ul(li("Item 1"), li("Item 2"), undefined, li("Item 3"), null).outerHTML,
-      "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>")
+        "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>")
       assertEq(ul([li("Item 1"), li("Item 2"), undefined, li("Item 3"), null]).outerHTML,
         "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>")
       // Deeply nested
@@ -65,7 +72,7 @@ const runTests = (van: Van, msgDom: Element) => {
     },
 
     tags_readonlyProps: () => {
-      assertEq(input({list: "datalist1"}).outerHTML, '<input list="datalist1">')
+      assertEq(input({ list: "datalist1" }).outerHTML, '<input list="datalist1">')
     },
 
     add_basic: () => {
@@ -105,18 +112,18 @@ const runTests = (van: Van, msgDom: Element) => {
     },
 
     tags_svg: () => {
-      const {circle, path, svg} = van.tags("http://www.w3.org/2000/svg")
-      const dom = svg({width: "16px", viewBox: "0 0 50 50"},
-        circle({cx: "25", cy: "25", "r": "20", stroke: "black", "stroke-width": "2", fill: "yellow"}),
-        circle({cx: "16", cy: "20", "r": "2", stroke: "black", "stroke-width": "2", fill: "black"}),
-        circle({cx: "34", cy: "20", "r": "2", stroke: "black", "stroke-width": "2", fill: "black"}),
-        path({"d": "M 15 30 Q 25 40, 35 30", stroke: "black", "stroke-width": "2", fill: "transparent"}),
+      const { circle, path, svg } = van.tags("http://www.w3.org/2000/svg")
+      const dom = svg({ width: "16px", viewBox: "0 0 50 50" },
+        circle({ cx: "25", cy: "25", "r": "20", stroke: "black", "stroke-width": "2", fill: "yellow" }),
+        circle({ cx: "16", cy: "20", "r": "2", stroke: "black", "stroke-width": "2", fill: "black" }),
+        circle({ cx: "34", cy: "20", "r": "2", stroke: "black", "stroke-width": "2", fill: "black" }),
+        path({ "d": "M 15 30 Q 25 40, 35 30", stroke: "black", "stroke-width": "2", fill: "transparent" }),
       )
       assertEq(dom.outerHTML, '<svg width="16px" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" stroke="black" stroke-width="2" fill="yellow"></circle><circle cx="16" cy="20" r="2" stroke="black" stroke-width="2" fill="black"></circle><circle cx="34" cy="20" r="2" stroke="black" stroke-width="2" fill="black"></circle><path d="M 15 30 Q 25 40, 35 30" stroke="black" stroke-width="2" fill="transparent"></path></svg>')
     },
 
     tags_math: () => {
-      const {math, mi, mn, mo, mrow, msup} = van.tags("http://www.w3.org/1998/Math/MathML")
+      const { math, mi, mn, mo, mrow, msup } = van.tags("http://www.w3.org/1998/Math/MathML")
       const dom = math(msup(mi("e"), mrow(mi("i"), mi("π"))), mo("+"), mn("1"), mo("="), mn("0"))
       assertEq(dom.outerHTML, '<math><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></math>')
     },
@@ -135,11 +142,13 @@ const runTests = (van: Van, msgDom: Element) => {
           "data-title": state3,
           "data-text": () => `Prefix - ${state4.rawVal} - Suffix`,
         }, () => state1.val, () => state2.oldVal, state3, () => state4.val),
-        button({onclick: van.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")')},
+        button({ onclick: van.derive(() => state5.val ? 'console.log("Hello")' : 'alert("Hello")') },
           "Button1"
         ),
-        button({onclick: van.derive(
-          () => state6.val ? () => console.log("Hello") : () => alert("Hello"))},
+        button({
+          onclick: van.derive(
+            () => state6.val ? () => console.log("Hello") : () => alert("Hello"))
+        },
           "Button2"
         ),
         () => (state5.val ? pre : div)(state3),
@@ -160,7 +169,7 @@ const runTests = (van: Van, msgDom: Element) => {
         head(title("Hello")),
         body(div("World")),
       ), "<!DOCTYPE html><html><head><title>Hello</title></head><body><div>World</div></body></html>")
-      assertEq(van.html({lang: "en"},
+      assertEq(van.html({ lang: "en" },
         head(title("Hello")),
         body(div("World")),
       ), '<!DOCTYPE html><html lang="en"><head><title>Hello</title></head><body><div>World</div></body></html>')
@@ -171,13 +180,13 @@ const runTests = (van: Van, msgDom: Element) => {
   // are always correct.
   const examples = {
     miniVanServer: () => {
-      assertEq(a({href: "https://vanjs.org/"}, "🍦VanJS").outerHTML, `<a href="https://vanjs.org/">🍦VanJS</a>`)
-      assertEq(button({onclick: 'alert("Hello")'}, "Click").outerHTML, `<button onclick="alert(&quot;Hello&quot;)">Click</button>`)
-      assertEq(input({type: "text", value: "value"}).outerHTML, `<input type="text" value="value">`)
+      assertEq(a({ href: "https://vanjs.org/" }, "🍦VanJS").outerHTML, `<a href="https://vanjs.org/">🍦VanJS</a>`)
+      assertEq(button({ onclick: 'alert("Hello")' }, "Click").outerHTML, `<button onclick="alert(&quot;Hello&quot;)">Click</button>`)
+      assertEq(input({ type: "text", value: "value" }).outerHTML, `<input type="text" value="value">`)
     }
   }
 
-  const suites = {tests, examples}
+  const suites = { tests, examples }
 
   for (const [k, v] of Object.entries(suites)) {
     for (const [name, func] of Object.entries(v)) {
@@ -206,7 +215,7 @@ const runTests = (van: Van, msgDom: Element) => {
         resultPre.innerText = "✅"
       } catch (e) {
         resultPre.innerText = "❌"
-        van.add(msgDom, div({style: "color: red"},
+        van.add(msgDom, div({ style: "color: red" },
           "Test failed, please check console for error message."
         ))
         throw e
@@ -217,8 +226,8 @@ const runTests = (van: Van, msgDom: Element) => {
 
 export const testVanFile = async (path: string, type: string) => {
   const van = await (type === "es6" ? import(path).then(r => r.default) : fetch(path).then(r => r.text()).then(t => (eval(t), (<any>window).van)))
-  const {div, h2} = van.tags
-  const msgDom = div({class: "testMsg"})
+  const { div, h2 } = van.tags
+  const msgDom = div({ class: "testMsg" })
   van.add(document.getElementById("msgPanel"), h2(`Running tests for ${path}`), msgDom)
   runTests(van, msgDom)
 }
